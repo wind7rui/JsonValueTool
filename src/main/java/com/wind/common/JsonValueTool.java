@@ -5,9 +5,34 @@ import com.alibaba.fastjson.JSONObject;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+/**
+ * 用于获取json字符串中指定key的value
+ *
+ * @author wind
+ * @since 05.05.2015
+ */
 public class JsonValueTool {
 
-    public static Object getValueByKeyExpression(Object originObject, String startKey, String targetKeyExpression) {
+    /**
+     * 用于获取json字符串中指定key的value
+     *
+     * 示例：
+     * json：{"name": "刘禅", "age": "6", "father": {"name": "刘备", "age": "50", "properties": {"country":{"id":"002","name": "蜀"}}}}
+     *
+     * 要获取country中的name值
+     * startKey = father
+     * targetKeyExpression = father#properties#country#name
+     *
+     * @param json
+     * @param startKey
+     * @param targetKeyExpression 使用#连接
+     * @return
+     */
+    public static Object getValueByKeyExpression(String json, String startKey, String targetKeyExpression) {
+        return doGetValueByKeyExpression(JSONObject.parseObject(json), startKey, targetKeyExpression);
+    }
+
+    private static Object doGetValueByKeyExpression(Object originObject, String startKey, String targetKeyExpression) {
         if (isNullOrEmpty(startKey)) {
             return originObject;
         }
@@ -47,6 +72,6 @@ public class JsonValueTool {
 
     private static Object getValueFromJSONObjectByKeyExpression(JSONObject originObject, String startKey, String targetKeyExpression) {
         Object object = originObject.get(startKey);
-        return object != null ? getValueByKeyExpression(object, getNextKey(startKey, targetKeyExpression), targetKeyExpression) : null;
+        return object != null ? doGetValueByKeyExpression(object, getNextKey(startKey, targetKeyExpression), targetKeyExpression) : null;
     }
 }
